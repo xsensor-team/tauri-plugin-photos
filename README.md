@@ -48,4 +48,8 @@ import { selectPhotos } from 'tauri-plugin-photos-api'
  ...
 
 const photos = await selectPhotos() // photos will be an array of base64 encoded images
+
+ ...
+
+<img src={`data:image/png;base64,${photos[0]}`} />
 ```
