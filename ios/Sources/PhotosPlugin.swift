@@ -6,7 +6,7 @@ import Photos
 import PhotosUI
 
 class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
-    private var completion: (([UIImage]?) -> Void)?  // Stored as an instance variable
+    private var pickerCompletion: (([UIImage]?) -> Void)?
 
     func requestAccess(completion: @escaping (Bool) -> Void) {
         PHPhotoLibrary.requestAuthorization { status in
@@ -17,10 +17,10 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
     }
 
     func presentImagePicker(from viewController: UIViewController, completion: @escaping ([UIImage]?) -> Void) {
-        self.completion = completion  // Store the passed completion block
+        self.pickerCompletion = completion  // Set the new completion handler
 
         var config = PHPickerConfiguration(photoLibrary: .shared())
-        config.selectionLimit = 5 
+        config.selectionLimit = 0  // No limit on selections
         config.filter = .images    // Only images can be picked
 
         let picker = PHPickerViewController(configuration: config)
@@ -31,8 +31,8 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true, completion: nil)
 
-        let group = DispatchGroup()
         var images: [UIImage] = []
+        let group = DispatchGroup()
 
         for result in results {
             group.enter()
@@ -45,8 +45,8 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
         }
 
         group.notify(queue: .main) { [weak self] in
-            self?.completion?(images)
-            self?.completion = nil  // Clear the completion handler after calling it
+            self?.pickerCompletion?(images)  // Use the current completion handler
+            self?.pickerCompletion = nil  // Clear the completion handler after use
         }
     }
 
