@@ -4,6 +4,6 @@ export async function execute() {
   await invoke("plugin:photos|execute")
 }
 
-export async function selectPhotos() {
-  return await invoke("plugin:photos|selectPhotos")
+export async function selectPhotos(selectionLimit: number = 1) {
+  return await invoke("plugin:photos|selectPhotos", { selectionLimit })
 }

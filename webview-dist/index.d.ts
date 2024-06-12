@@ -1,2 +1,2 @@
 export declare function execute(): Promise<void>;
-export declare function selectPhotos(): Promise<unknown>;
+export declare function selectPhotos(selectionLimit?: number): Promise<unknown>;
