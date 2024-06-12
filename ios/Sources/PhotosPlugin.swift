@@ -32,7 +32,10 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
 
     let picker = PHPickerViewController(configuration: config)
     picker.delegate = self
-    viewController.present(picker, animated: true, completion: nil)
+    viewController.present(picker, animated: true) {
+      // Reset completion handler to avoid reuse issues
+      self.pickerCompletion = nil
+    }
   }
 
   func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
