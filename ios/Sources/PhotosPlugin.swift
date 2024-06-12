@@ -24,11 +24,11 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
     from viewController: UIViewController, selectionLimit limit: Int,
     completion: @escaping ([UIImage]?) -> Void
   ) {
-    self.pickerCompletion = completion  // Set the new completion handler
+    self.pickerCompletion = completion
 
     var config = PHPickerConfiguration(photoLibrary: .shared())
-    config.selectionLimit = limit  // No limit on selections
-    config.filter = .images  // Only images can be picked
+    config.selectionLimit = limit
+    config.filter = .images
 
     let picker = PHPickerViewController(configuration: config)
     picker.delegate = self
@@ -43,7 +43,7 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
 
     for result in results {
       group.enter()
-      result.itemProvider.loadObject(ofClass: UIImage.self) { [] (object, error) in
+      result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
         defer { group.leave() }
         if let image = object as? UIImage {
           images.append(image)
@@ -52,8 +52,8 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
     }
 
     group.notify(queue: .main) { [weak self] in
-      self?.pickerCompletion?(images)  // Use the current completion handler
-      self?.pickerCompletion = nil  // Clear the completion handler after use
+      self?.pickerCompletion?(images)
+      self?.pickerCompletion = nil
     }
   }
 
@@ -70,7 +70,7 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
       requestAccess { [weak self] authorized in
         if authorized {
           self?.presentImagePicker(
-            from: rootViewController, selectionLimit: Int(selectionLimit)
+            from: rootViewController, selectionLimit: selectionLimit
           ) { images in
             if let images = images {
               let imageData = images.compactMap { $0.pngData() }
@@ -85,10 +85,8 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
       }
     } catch {
       invoke.reject("Invalid arguments.")
-      return
     }
   }
-
 }
 
 @_cdecl("init_plugin_photos")
