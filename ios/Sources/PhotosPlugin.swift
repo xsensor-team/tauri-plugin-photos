@@ -30,6 +30,8 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
     config.selectionLimit = limit
     config.filter = .images
     config.preferredAssetRepresentationMode = .current
+    config.selection = .ordered  // Ensure ordered selection
+    config.preselectedAssetIdentifiers = []  // Clear any preselected assets
     let picker = PHPickerViewController(configuration: config)
     picker.delegate = self
     viewController.present(picker, animated: true, completion: nil)
@@ -37,8 +39,15 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
 
   func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
     picker.dismiss(animated: true, completion: nil)
+    if results.isEmpty {
+      self.pickerCompletion?([])
+      self.pickerCompletion = nil
+      return
+    }
+
     var images: [UIImage] = []
     let group = DispatchGroup()
+
     for result in results {
       group.enter()
       result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
@@ -48,6 +57,7 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
         }
       }
     }
+
     group.notify(queue: .main) { [weak self] in
       self?.pickerCompletion?(images)
       self?.pickerCompletion = nil
