@@ -12,24 +12,24 @@ class CommandArgs: Decodable {
 class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
   private var pickerCompletion: (([UIImage]?) -> Void)?
 
-  func requestAccess(completion: @escaping (Bool) -> Void) {
-    PHPhotoLibrary.requestAuthorization { status in
+  func requestLimitedAccess(completion: @escaping (Bool) -> Void) {
+    PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
       DispatchQueue.main.async {
-        completion(status == .authorized)
+        completion(status == .authorized || status == .limited)
       }
     }
   }
 
   func presentImagePicker(
-    from viewController: UIViewController, selectionLimit limit: Int,
+    from viewController: UIViewController,
+    selectionLimit limit: Int,
     completion: @escaping ([UIImage]?) -> Void
   ) {
     self.pickerCompletion = completion
-
     var config = PHPickerConfiguration(photoLibrary: .shared())
     config.selectionLimit = limit
     config.filter = .images
-
+    config.preferredAssetRepresentationMode = .current
     let picker = PHPickerViewController(configuration: config)
     picker.delegate = self
     viewController.present(picker, animated: true, completion: nil)
@@ -37,10 +37,8 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
 
   func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
     picker.dismiss(animated: true, completion: nil)
-
     var images: [UIImage] = []
     let group = DispatchGroup()
-
     for result in results {
       group.enter()
       result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
@@ -50,7 +48,6 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
         }
       }
     }
-
     group.notify(queue: .main) { [weak self] in
       self?.pickerCompletion?(images)
       self?.pickerCompletion = nil
@@ -67,10 +64,11 @@ class PhotosPlugin: Plugin, PHPickerViewControllerDelegate {
       let args = try invoke.parseArgs(CommandArgs.self)
       let selectionLimit = args.selectionLimit ?? 0
 
-      requestAccess { [weak self] authorized in
+      requestLimitedAccess { [weak self] authorized in
         if authorized {
           self?.presentImagePicker(
-            from: rootViewController, selectionLimit: selectionLimit
+            from: rootViewController,
+            selectionLimit: selectionLimit
           ) { images in
             if let images = images {
               let imageData = images.compactMap { $0.pngData() }
