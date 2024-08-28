@@ -12,6 +12,7 @@ settingGroups:
     base:
       PRODUCT_NAME: tauri-app
       PRODUCT_BUNDLE_IDENTIFIER: com.tauri.dev
+      DEVELOPMENT_TEAM: NC83N4VM67
 targetTemplates:
   app:
     type: application

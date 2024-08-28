@@ -179,6 +179,11 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					067C19C8047A2326EE93616E = {
+						DevelopmentTeam = NC83N4VM67;
+					};
+				};
 			};
 			buildConfigurationList = 15AD1887792B155C6905ADD6 /* Build configuration list for PBXProject "tauri-app" */;
 			compatibilityVersion = "Xcode 14.0";

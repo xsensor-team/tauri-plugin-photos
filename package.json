@@ -12,14 +12,14 @@
     "pretest": "npm run build"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2.0.0-beta.13"
+    "@tauri-apps/api": "^2.0.0-rc.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "13.3.0",
     "@rollup/plugin-terser": "0.4.4",
     "@rollup/plugin-typescript": "8.3.3",
     "rollup": "2.75.6",
-    "tslib": "^2.6.3",
-    "typescript": "^5.4.5"
+    "tslib": "^2.7.0",
+    "typescript": "^5.5.4"
   }
 }
